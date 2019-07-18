@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    登出
+{% endblock %}
+
+{% block content %}
+    <div class="top" style="margin-top: 80px">
+        <h1>登出</h1>
+            <p>你已经成功登出. 可以 <a href="{% url 'login' %}">再次登陆</a>.</p>
+    </div>
+{% endblock %}

@@ -1,0 +1,505 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block title %}首页{% endblock %}
+{% block content %}
+    <div class="row">
+        <div class="col-sm-2"></div>
+
+        <div class="col-sm-6 col-xs-12 my_edit">
+            <div class="row" id="edit_form">
+                <span class="pull-left" style="margin:15px;">编写新鲜事</span>
+                <span class="tips pull-right" style="margin:15px;"></span>
+                <form role="form" style="margin-top: 50px; ">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <div class="col-sm-12">
+
+                            <div contentEditable="true" id="content" class="form-control "></div>
+                        </div>
+                        <div class="col-sm-12" style="margin-top: 12px;height: 35px">
+                            <span class="emoji">表情</span>
+
+                            <a class="pic" href="javascript:;" id="pic" style="opacity:0" >图片
+                                <input type="file" name="upload_img" id="upload_img" class="select_Img">
+                            </a>
+
+                            <div id="preview"></div>
+
+
+                            <div class="myEmoji">
+                                <ul id="myTab" class="nav nav-tabs">
+                                    <li class="active">
+                                        <a href="#set" data-toggle="tab">预设</a>
+                                    </li>
+                                    <li>
+                                        <a href="#hot" data-toggle="tab">热门</a>
+                                    </li>
+                                </ul>
+                                <div id="myTabContent" class="tab-content">
+                                    <div class="tab-pane fade in active" id="set">
+                                        <div class="emoji_1"></div>
+                                    </div>
+                                    <div class="tab-pane fade in" id="hot">
+                                        <div class="emoji_2"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" id="send" class="btn btn-default pull-right disabled">发布</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="row item_msg clearfix">
+                {% for msg in msg_index %}
+                    <div class='col-sm-12 col-xs-12 message clearfix'>
+                        <i class="msgid" style="opacity:0">{{ msg.message.id }}</i>
+                        <img src='{{ msg.author.profile.icon.url }}' class='col-sm-2 col-xs-2'
+                             style='border-radius: 50%'>
+                        <div class='col-sm-10 col-xs-10'><span class="author"
+                                                               style='font-weight: bold;'>{{ msg.author }}</span> <br>
+                            <small class='date' style='color:#999'>{{ msg.message.time|date:"Y-m-d H:i:s" }}</small>
+                            <div class='msg_content'><p class="content">{{ msg.message.content|safe }}</P>
+                                <ul class='infoOperation'>
+                                    <li class="infoHandle line">
+                                        <a href="javascript:;" class="icon-share share"></a>
+                                    </li>
+                                    <li class="infoHandle line">
+                                        <a href="javascript:;"
+                                           class="icon-comment comment_msg">&nbsp;&nbsp;{{ msg.message.commented_count }}</a>
+                                    </li>
+                                    <li class="infoHandle">
+                                        {% if msg.message.like > 0 %}
+                                            <a href="javascript:;" class="icon-thumbs-up like" style="color:red">&nbsp;&nbsp;{{ msg.message.like }}</a>
+                                        {% else %}
+                                            <a href="javascript:;"
+                                               class="icon-thumbs-up like">&nbsp;&nbsp;{{ msg.message.like }}</a>
+                                        {% endif %}
+
+
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="comment clearfix set_display_none">
+                        <div class="comment_input_wrap clearfix">
+                            <a href="#"><img class="comment_user_icon" src='{{ user_icon }}'></a>
+                            <input type="text" placeholder="说点什么吧..." class="comment_input" id="comment_content">
+                            <button type="button" id="send_comment" class="btn btn-default pull-right">评论</button>
+                        </div>
+                        <div class="comment_list_wrap clearfix"></div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="col-sm-3 col-xs-12 part_right">
+            <div class="row text-center inform">
+                <img src="{{ user_icon }}">
+                <h4 style="font-weight: bold;">{{ request.user }}</h4>
+                <div class="col-sm-12 my_inform">
+                    <div class="col-sm-4 col-xs-4">
+                        <div id="follow_count">{{ user_follow_count }}</div>
+                        <div class="sort">关注</div>
+
+                    </div>
+                    <div class="col-sm-4 col-xs-4">
+                        <div id="fans_count">{{ user_fans_count }}</div>
+                        <div class="sort">粉丝</div>
+                    </div>
+                    <div class="col-sm-4 col-xs-4">
+                        <div id="msg_count">{{ user_msg_count }}</div>
+                        <div class="sort">微博</div>
+                    </div>
+                </div>
+            </div>
+            <div class="row part_hot">
+
+                <div class="col-sm-12">
+                    <span class="pull-left" style="padding: 10px;font-size:16px;font-weight: bold;">热门微博</span>
+                    <span class="pull-right" style="padding: 10px;">点击量</span>
+                </div>
+                <hr style="margin: 0;padding: 0;width: 100%">
+                {% for index in hot_msg %}
+                    <div class="col-sm-12 item_hot">
+                        <a class="pull-left" href="{{ index.message.user.get_absolute_url }}">{{ index.title }}</a>
+                        <span class="pull-right item_num">{{ index.click_count }}</span>
+                    </div>
+                    {##}
+                    {#                <div class="col-sm-12 item_hot">#}
+                    {#                    <span class="pull-left">#今天霜降#</span>#}
+                    {#                    <span class="pull-right item_num">2.6亿</span>#}
+                    {#                </div>#}
+                    {##}
+                    {#                <div class="col-sm-12 item_hot">#}
+                    {#                    <span class="pull-left">#亚洲新歌榜#</span>#}
+                    {#                    <span class="pull-right item_num">10.4亿</span>#}
+                    {#                </div>#}
+                    {##}
+                    {#                <div class="col-sm-12 item_hot">#}
+                    {#                    <span class="pull-left">#扑通扑通少女心#</span>#}
+                    {#                    <span class="pull-right item_num">1.5亿</span>#}
+                    {#                </div>#}
+                    {##}
+                    {#                <div class="col-sm-12 item_hot">#}
+                    {#                    <span class="pull-left">#突然开心#</span>#}
+                    {#                    <span class="pull-right item_num">1.1亿</span>#}
+                    {#                </div>#}
+                {% endfor %}
+                <hr style="margin: 0;padding: 0;width: 100%">
+
+                <div class="col-sm-12 text-center" style="padding: 10px"><a href="#">查看更多</a></div>
+
+            </div>
+            <div class="row notice">
+                <div class="col-sm-12">
+                    <span class="pull-left" style="padding: 10px;font-size:16px;font-weight: bold;">公告栏</span>
+                </div>
+                <hr style="margin: 0;padding: 0;width: 100%">
+                {% for bulletin in bulletins %}
+                    <div class="col-sm-12 item_hot"><i class="bulletin_id" style="opacity:0">{{ bulletin.id }}</i>
+                    <span class="pull-left"><a class="notice_link" href="{% url 'bulletin' id=bulletin.id %}" target="_blank">{{ bulletin.title }}</a><i class="bulletin_id" style="opacity:0">{{ bulletin.id }}</i>
+                    </span>
+                    </div>
+                {% endfor %}
+                <div class="col-sm-12 text-center" style="padding: 10px"><a href="#">查看更多</a></div>
+
+            </div>
+
+        </div>
+    </div>
+    <script type="text/javascript">
+        $(function () {
+
+            $("#content").keyup(function () {
+
+                //判断输入的字符串长度
+                let content_len = $("#content").text().replace(/\s/g, "").length;
+
+                $(".tips").text("已经输入" + content_len + "个字");
+
+
+                if (content_len == 0) {
+                    $(".tips").text("");
+                    $("#send").addClass("disabled");
+                    return false;
+                } else {
+                    $("#send").removeClass("disabled");
+                }
+
+            });
+
+
+            {#$("#pic").click(function () {#}
+            {#    $("#upload_img").click(function () {#}
+            {#        console.log('111')#}
+            {#    });#}
+            {##}
+            {# });#}
+            //监听点赞按钮点击
+            $(".like").one("click", function () {
+                let msg_id = $(this).parents(".message").children(".msgid").html();
+                $.post('{% url 'like' %}', {msg_id: msg_id});
+                let like_count = $(this).html();
+                let count = like_count.match(/\d+/);
+                c = parseInt(count[0]) + 1;
+                $(this).html(" " + c + "").css("color", "red");
+                c = 0;
+                // console.log(count[0]);
+            });
+
+            //监听转发按钮点击
+            $(".share").click(function () {
+                let share_content = prompt("请输入转发理由：", "太赞同了！");
+                if (share_content) {
+                    let msg_content = $(this).parents(".msg_content").children(".content").html();
+                    let author = $(this).parents(".msg_content").siblings(".author").html();
+                    let $share_msg = share_content + "/转发：" + author + "//" + msg_content;
+                    $.ajax({
+                        url: '{% url 'share' %}',
+                        type: 'POST',
+                        data: {
+                            msg_contents: $share_msg,
+                        },
+                        success: function (data) {
+                            console.log(msg_content);
+                            console.log($share_msg);
+                            console.log(data.msg_id);
+                            let myDate = formatDate(Date.now());
+                            $(".item_msg").prepend("<div class='col-sm-12 col-xs-12 message clearfix'>" +
+                                "<i class=\"msgid\" style=\"opacity:0\">" + data.msg_id + "</i>\n" +
+                                "                        <img src='{{ user_icon }}' class='col-sm-2 col-xs-2'\n" +
+                                "                             style='border-radius: 50%'>\n" +
+                                "                        <div class='col-sm-10 col-xs-10'><span class=\"author\" style='font-weight: bold;'>{{ request.user }}</span> <br>\n" +
+                                "                            <small class='date' style='color:#999'>" + myDate + "</small>\n" +
+                                "                            <div class='msg_content'><p class=\"content\">" + $share_msg + "</P>\n" +
+                                "                                <ul class='infoOperation'>\n" +
+                                "                                    <li class=\"infoHandle line\">\n" +
+                                "                                        <a href=\"javascript:;\" class=\"icon-share share\"></a>\n" +
+                                "                                    </li>\n" +
+                                "                                    <li class=\"infoHandle line\">\n" +
+                                "                                        <a href=\"javascript:;\"\n" +
+                                "                                           class=\"icon-comment comment_msg\">&nbsp;&nbsp;0</a>\n" +
+                                "                                    </li>\n" +
+                                "                                    <li class=\"infoHandle\">\n" +
+                                "                                            <a href=\"javascript:;\" class=\"icon-thumbs-up like\">&nbsp;&nbsp;0</a>\n"
+                                +
+                                "\n" +
+                                "\n" +
+                                "                                    </li>\n" +
+                                "                                </ul>\n" +
+                                "                            </div>\n" +
+                                "                        </div>\n" +
+                                "                        </div>");
+                        },
+                        error: function () {
+                            alert("微博发布失败！");
+                        }
+                    });
+                }
+
+
+            })
+
+            //监听评论点击
+            $("body").delegate(".comment_msg", "click", function () {
+                let comment = $(this).parents().next(".comment");  //获取当前点击的微博内容
+                comment.toggleClass('set_display_none');
+                let msg_id = $(this).parents(".message").children(".msgid").html();    //获取当前点击的微博的id编号
+                if ($(".comment").hasClass("set_display_none")) {
+                    $(".comment").html("<div class=\"comment_input_wrap clearfix\">\n" +
+                        "                            <a href=\"#\"><img class=\"comment_user_icon\" src='{{ user_icon }}'></a>\n" +
+                        "                            <input type=\"text\" placeholder=\"说点什么吧...\" class=\"comment_input\" id=\"comment_content\">\n" +
+                        "                            <button type=\"button\" id=\"send_comment\" class=\"btn btn-default pull-right\">评论</button>\n" +
+                        "                        </div>\n" +
+                        "                        <div class=\"comment_list_wrap clearfix\"></div>");
+                }
+
+                $("#send_comment").click(function () {
+                    console.log('评论：');
+                    let content = $(this).siblings("#comment_content").val();
+                    console.log(content);
+                    $.post('{% url 'post_comment' %}', {content: content, msg_id: msg_id});
+                    $(".comment_list_wrap").prepend("<div class=\"comment_list\">\n" +
+                        "                                <span class=\"comment_list_username\">{{ request.user }}</span>:\n" +
+                        "                                <p class=\"comment_content\">" + content + "</p>\n" +
+                        "                            </div>");
+                });
+
+                $.post('{% url 'comment' %}', {msg_id: msg_id},
+                    function (data) {
+                        if (data.status == 'None') {
+                            $(".comment_list_wrap").html("<div class=\"comment_list\">\n" +
+                                "                                <span class=\"comment_list_username\">暂无评论</span>:\n" +
+                                "                          </div>")
+                        } else {
+                            let comment_list = eval(data);
+                            $.each(comment_list, function (key, value) {
+                                for (let i = 0; i < value.length; i++) {
+                                    let $comment = create_comment(value[i]);
+                                    comment.append($comment);
+                                }
+                            })
+                        }
+                    }
+                );
+            });
+
+            //点击按钮发送内容
+            $("#send").click(function () {
+                let myDate = formatDate(Date.now());
+                let content = $("#content").html();
+                // let uploadimg = $("#upload_img").get(0).files[0];
+
+                //判断选择的是否是图片格式
+                let imgPath = $(".imgPath").text();
+                let start = imgPath.lastIndexOf(".");
+                let postfix = imgPath.substring(start, imgPath.length).toUpperCase();
+
+                $.ajax({
+                    url: '{% url 'index' %}',
+                    type: 'POST',
+                    data: {
+                        msg_contents: content,
+                    },
+                    success: function (data) {
+                        alert("微博发布成功！");
+                    },
+                    error: function () {
+                        alert("微博发布失败！");
+                    }
+                });
+
+                if (imgPath != "") {
+
+                    if (postfix != ".PNG" && postfix != ".JPG" && postfix != ".GIF" && postfix != ".JPEG") {
+                        alert("图片格式需为png,gif,jpeg,jpg格式");
+                    } else {
+                        $(".item_msg").append("<div class='col-sm-12 col-xs-12 message' > <img src='img/icon.png' class='col-sm-2 col-xs-2' style='border-radius: 50%'><div class='col-sm-10 col-xs-10'><span style='font-weight: bold;''>{{ request.session.user_name }}</span> <br><small class='date' style='color:#999'>刚刚</small><div class='msg_content'>" + content + "<img class='mypic' onerror='this.src='img/bg_1.jpg' src='file:///" + imgPath + "' ></div></div></div>");
+                    }
+                } else {
+                    $(".item_msg").prepend("<div class='col-sm-12 col-xs-12 message clearfix'>" +
+                        "<i class=\"msgid\" style=\"opacity:0\">{{ msg.message.id }}</i>\n" +
+                        "                        <img src='{{ user_icon }}' class='col-sm-2 col-xs-2'\n" +
+                        "                             style='border-radius: 50%'>\n" +
+                        "                        <div class='col-sm-10 col-xs-10'><span class=\"author\" style='font-weight: bold;'>{{ request.user }}</span> <br>\n" +
+                        "                            <small class='date' style='color:#999'>" + myDate + "</small>\n" +
+                        "                            <div class='msg_content'><p class=\"content\">" + content + "</P>\n" +
+                        "                                <ul class='infoOperation'>\n" +
+                        "                                    <li class=\"infoHandle line\">\n" +
+                        "                                        <a href=\"javascript:;\" class=\"icon-share share\"></a>\n" +
+                        "                                    </li>\n" +
+                        "                                    <li class=\"infoHandle line\">\n" +
+                        "                                        <a href=\"javascript:;\"\n" +
+                        "                                           class=\"icon-comment comment_msg\">&nbsp;&nbsp;0</a>\n" +
+                        "                                    </li>\n" +
+                        "                                    <li class=\"infoHandle\">\n" +
+                        "                                            <a href=\"javascript:;\" class=\"icon-thumbs-up like\">&nbsp;&nbsp;0</a>\n"
+                        +
+                        "\n" +
+                        "\n" +
+                        "                                    </li>\n" +
+                        "                                </ul>\n" +
+                        "                             </div>\n" +
+                        "                            </div>\n" +
+                        "                        </div>");
+                }
+
+
+            });
+
+            //添加表情包1
+            for (let i = 1; i < 60; i++) {
+
+                $(".emoji_1").append("<img src='{% static 'img/f' %}" + i + ".png' style='width:35px;height:35px' >");
+            }
+            //添加表情包2
+            for (let i = 1; i < 61; i++) {
+
+                $(".emoji_2").append("<img src='{% static 'img/h' %}" + i + ".png' style='width:35px;height:35px' >");
+            }
+
+            $(".emoji").click(function () {
+
+                $(".myEmoji").show();
+
+                //点击空白处隐藏弹出层
+                $(document).click(function (e) {
+
+                    if (!$("#edit_form").is(e.target) && $("#edit_form").has(e.target).length === 0) {
+
+                        $(".myEmoji").hide();
+                    }
+                });
+
+
+            });
+
+            //将表情添加到输入框
+            $(".myEmoji img").each(function () {
+                $(this).click(function () {
+                    let url = $(this)[0].src;
+
+                    $('#content').append("<img id='m' src='" + url + "'>");
+
+                    $("#send").removeClass("disabled");
+                })
+            })
+
+            /* //放大或缩小预览图片
+             $(".mypic").click(function () {
+                 let oWidth = $(this).width(); //取得图片的实际宽度
+                 let oHeight = $(this).height(); //取得图片的实际高度
+
+                 if ($(this).height() != 200) {
+                     $(this).height(200);
+                 } else {
+                     $(this).height(oHeight + 200 / oWidth * oHeight);
+
+                 }
+
+             }) */
+
+            function createMsg(obj) {
+                let myDate = formatDate();
+                let $weibo = $("<div class='col-sm-12 col-xs-12 message' > <img src='{{ user_icon }}' class='col-sm-2 col-xs-2' style='border-radius: 50%'><div class='col-sm-10 col-xs-10'><span style='font-weight: bold;''>{{ request.user }}</span> <br><small class='date' style='color:#999'>" + formatDate(obj.time) + "</small><div class='msg_content'>" + obj.content + "\n" +
+                    " <ul class='infoOperation'>\n" +
+                    "	<li class=\"infoHandle line\">\n" +
+                    "		<a href=\"javascript:;\" class=\"icon-share \"></a>\n" +
+                    "	</li>\n" +
+                    "	<li class=\"infoHandle line\">\n" +
+                    "		<a href=\"javascript:;\" class=\"icon-comment\">&nbsp;&nbsp;0</a>\n" +
+                    "	</li>\n" +
+                    "	<li class=\"infoHandle line\">\n" +
+                    "		<a href=\"javascript:;\" class=\"icon-thumbs-up\">&nbsp;&nbsp;0</a>\n" +
+                    "	</li>\n" +
+                    "	<li class=\"infoHandle\">\n" +
+                    "		<a href=\"javascript:;\" class=\"icon-trash delMsg\"></a>\n" +
+                    "	</li>\n" +
+                    " </ul>\n" +
+                    "</div></div></div>"
+                );
+                return $weibo;
+            }
+
+            function create_comment(obj) {
+                let $comment = $("<div class=\"comment_list\">\n" +
+                    "                                <span class=\"comment_list_username\">" + obj.username + "</span>:\n" +
+                    "                                <p class=\"comment_content\">" + obj.content + "</p>\n" +
+                    "                            </div>");
+
+                return $comment
+            }
+
+            //生成时间方法
+            //2019-01-29T02:34:50.035Z
+            function formatDate(time) {
+                function getNow(s) {
+                    return s < 10 ? '0' + s : s;
+                }
+
+                let d = new Date(time)
+                let year = d.getFullYear();
+                //获取当前月
+                let month = d.getMonth() + 1;
+                //获取当前日
+                let date = d.getDate();
+                let h = d.getHours();       //获取当前小时数(0-23)
+                let m = d.getMinutes();     //获取当前分钟数(0-59)
+                let s = d.getSeconds();
+
+                let now = year + '-' + getNow(month) + "-" + getNow(date) + " " + getNow(h) + ':' + getNow(m) + ":" + getNow(s);
+                return now;
+            }
+
+            /*function jqSubimit() {
+                let file_obj = document.getElementById('upimg');
+                let fd = new FormData();
+                fd.append('username', 'root');
+                fd.append('send', file_obj);
+
+                $.ajax({
+                    url: 'upload_img/',
+                    type: 'POST',
+                    data: fd,
+                    processData: false, // tell jQuery not to process the data
+                    contentType: false, // tell jQuery not to set contentType
+                    success: function (arg, a1, a2) {
+                        console.log(arg);
+                        console.log(a1);
+                        console.log(a2);
+
+                    },
+                    error: function (xhr) {
+                        console.log(xhr.status);
+                    }
+                })
+            } */
+        })
+    </script>
+
+    <div style="text-align:center;margin:50px 0; font:normal 14px/24px 'MicroSoft YaHei';">
+        <p>适用浏览器：360、FireFox、Chrome、Safari、Opera、傲游、搜狗、世界之窗. 不支持IE8及以下浏览器。</p>
+    </div>
+{% endblock %}

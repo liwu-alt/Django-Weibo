@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block title %}公告{% endblock %}
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/search.css' %}">
+{% endblock %}
+{% block content %}
+    <div class="row card_wrap">
+        <div class="col-sm-2"></div>
+        <div class="col-sm-6 col-xs-12">
+        <h3>{{ bulletin_item.title }}</h3>
+            {{ bulletin_item.content|safe }}
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block title %}搜索结果{% endblock %}
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/search.css' %}">
+{% endblock %}
+{% block content %}
+<div class="row card_wrap">
+    <div class="col-sm-2"></div>
+    <div class="col-sm-6 col-xs-12">
+        <h5>{{ query }}</h5>
+        {% if page %}
+            {% for item in page %}
+            <div class="card_user_wrap clearfix">
+                <div class="avatar">
+                    <a href="{{ item.object.user.get_absolute_url }}"><img class="user_icon" src="{{ item.object.icon.url }}"></a>
+                </div>
+                <div class="info">
+                    <div>
+                        <a href={{ item.object.user.get_absolute_url }} class="name">{{ item.object.user }}</a>
+                    </div>
+                    <p>
+                        <span>关注<i>{{ item.object.follow_count }}</i></span>
+                        <span>粉丝<i>{{ item.object.fans_count }}</i></span>
+                        <span>微博<i>{{ item.object.msg_count }}</i></span>
+                    </p>
+                    <p>
+                        简介：<span>{{ item.object.profile }}</span>
+                    </p>
+                </div>
+            </div>
+            {% endfor %}
+
+        {% else %}
+            <h2>未找到{{ query }}的相关信息</h2>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

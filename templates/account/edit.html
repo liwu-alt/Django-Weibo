@@ -1,0 +1,20 @@
+{#edit.html#}
+{% extends 'base.html' %}
+
+{% block title %}
+Edit your account
+{% endblock %}
+
+{% block content %}
+     <div class="top" style="margin-top: 80px">
+<h1>编辑个人信息</h1>
+    <p>你可以修改下列相关信息:</p>
+    <form action="." method="post" enctype="multipart/form-data" novalidate>
+    {{ user_form.as_p }}
+    {{ profile_form.as_p }}
+    {% csrf_token %}
+        <p><input type="submit" value="保存修改"></p>
+    </form>
+    <a href="{% url 'password_change' %}">修改密码</a>
+     </div>
+{% endblock %}

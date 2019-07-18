@@ -1,0 +1,47 @@
+.card_wrap {
+    margin-top: 70px;
+}
+
+.card_user_wrap {
+    border-top: 1px solid #eee;
+    padding: 16px;
+}
+
+.avatar {
+    float: left;
+    margin-right: 15px;
+}
+.info{
+    float: left;
+}
+.user_icon {
+    width: 85px;
+    height: 85px;
+}
+
+.name {
+    font-size: 14px;
+    font-weight: 700;
+    color: #000;
+}
+
+.info p{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    word-wrap: normal;
+    font-size: 12px;
+    margin: 6px 0;
+   color: #808080;
+}
+
+.info p span{
+    padding-right: 12px;
+    margin-right: 12px;
+    border-right: 1px solid #d9d9d9;
+}
+
+.info p span i{
+    padding-left: 5px;
+    color: #6097d6;;
+}

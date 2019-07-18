@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block title %}我的粉丝{% endblock %}
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/search.css' %}">
+{% endblock %}
+{% block content %}
+<div class="row card_wrap">
+    <div class="col-sm-2"></div>
+    <div class="col-sm-6 col-xs-12">
+        <h5>一共关注了{{ follow_count }}位作者</h5>
+        {% if follow_count > 0  %}
+            {% for follow in follow_info %}
+            <div class="card_user_wrap clearfix">
+                <div class="avatar">
+                    <a href="{{ follow.user_to.get_absolute_url }}"><img class="user_icon" src="{{ follow.user_to.profile.icon.url }}"></a>
+                </div>
+                <div class="info">
+                    <div>
+                        <a href={{ follow.user_to.get_absolute_url }} class="name">{{ follow.user_to }}</a>
+                    </div>
+                    <p>
+                        <span>关注<i>{{ follow.user_to.profile.follow_count }}</i></span>
+                        <span>粉丝<i>{{ follow.user_to.profile.fans_count }}</i></span>
+                        <span>微博<i>{{ follow.user_to.profile.msg_count }}</i></span>
+                    </p>
+                    <p>
+                        简介：<span>{{ follow.user_to.profile.profile }}</span>
+                    </p>
+                </div>
+            </div>
+            {% endfor %}
+
+        {% else %}
+            <h2>还没有关注任何人</h2>
+        {% endif %}
+
+
+    </div>
+</div>
+{% endblock %}

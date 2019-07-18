@@ -1,0 +1,281 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block title %}个人中心{% endblock %}
+{% block content %}
+    <div class="row">
+        <div class="col-lg-8 col-lg-offset-2">
+            <div class="cover_wrap">
+                <div class="pf_photo">
+                    <a href={% url 'edit' %}><img class="pf_img" alt="编辑个人信息" src={{ user_profile.icon.url }}></a>
+                    <div class="pf_username">
+                        <h1 class="username">{{ user_profile.user }}</h1>
+                    </div>
+                </div>
+                <div class="profile_text">
+                    <span><p>{{ user_profile.profile }}</p></span>
+                </div>
+                {% if request.user != user_profile.user %}
+                    <a href="#" class="s_btn follow" data-id="{{ user.id }}"
+                       data-action="{% if request.user in user.followers.all %}un{% endif %}follow">
+                        {% if request.user not in user.followers.all %}
+                            Follow
+                        {% else %}
+                            Unfollow
+                        {% endif %}
+
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="row">
+    </div>
+    <div class="col-lg-2 PCD_counter col-lg-offset-2">
+        <div class="WB_innerwrap">
+            <table class="tb_counter">
+                <tbody>
+                <tr>
+                    <td>
+                        <a class="S_txt1" href="{% url 'my_follow' %}">
+                            <strong class="W_f18">{{ user_profile.follow_count }}</strong>
+                            <span class="S_txt2">关注</span>
+                        </a>
+                    </td>
+                    <td class="S_line1">
+                        <a class="S_txt1" href="{% url 'my_fans' %}">
+                            <strong class="W_f18">{{ user_profile.fans_count }}</strong>
+                            <span class="S_txt2">粉丝</span>
+                        </a>
+                    </td>
+                    <td class="S_line1">
+                        <a class="S_txt1" href="#">
+                            <strong class="W_f18">{{ user_profile.msg_count }}</strong>
+                            <span class="S_txt2">微博</span>
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="col-lg-6 ">
+        <div style="margin-top: 3px">
+            <div class="item_msg">
+                {% for msg in msgs.object_list %}
+                    <div class='col-sm-12 col-xs-12 message clearfix'>
+                        <i class="msgid" style="opacity:0">{{ msg.id }}</i>
+                        <img src='{{ user_profile.icon.url }}' class='col-sm-2 col-xs-2'
+                             style='border-radius: 50%'>
+                        <div class='col-sm-10 col-xs-10'><span class="author"
+                                                               style='font-weight: bold;'>{{ msg.user }}</span> <br>
+                            <small class='date' style='color:#999'>{{ msg.time|date:"Y-m-d H:i:s" }}</small>
+                            <div class='msg_content'><p class="content">{{ msg.content|safe }}</P>
+                                <ul class='infoOperation'>
+                                    <li class="infoHandle line">
+                                        <a href="javascript:;" class="icon-share share"></a>
+                                    </li>
+                                    <li class="infoHandle line">
+                                        <a href="javascript:;"
+                                           class="icon-comment comment_msg">&nbsp;&nbsp;{{ msg.commented_count }}</a>
+                                    </li>
+                                    <li class="infoHandle line">
+                                        {% if msg.like > 0 %}
+                                            <a href="javascript:;" class="icon-thumbs-up like" style="color:red">&nbsp;&nbsp;{{ msg.like }}</a>
+                                        {% else %}
+                                            <a href="javascript:;"
+                                               class="icon-thumbs-up like">&nbsp;&nbsp;{{ msg.like }}</a>
+                                        {% endif %}
+                                    </li>
+                                    {% if request.user == msg.user %}
+                                        <li class="infoHandle">
+                                            <a href="javascript:;" msg-id="{{ msg.id }}" class="icon-trash delMsg"></a>
+                                        </li>
+                                    {% endif %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="comment clearfix set_display_none">
+                        <div class="comment_input_wrap clearfix">
+                            <a href="#"><img class="comment_user_icon" src='{{ user_icon }}'></a>
+                            <input type="text" placeholder="说点什么吧..." class="comment_input" id="comment_content">
+                            <button type="button" id="send_comment" class="btn btn-default pull-right">评论</button>
+                        </div>
+                        <div class="comment_list_wrap clearfix"></div>
+                    </div>
+                {% endfor %}
+                <div id="pages" class="text-center">
+                    <nav>
+                        <ul class="pagination">
+                            <li class="step-links">
+                                {% if msgs.has_previous %}
+                                    <a class='active' href="?page={{ msgs.previous_page_number }}">上一页</a>
+                                {% endif %}
+
+                                <span class="current">
+                    Page {{ msgs.number }} of {{ msgs.paginator.num_pages }}</span>
+
+                                {% if msgs.has_next %}
+                                    <a class='active' href="?page={{ msgs.next_page_number }}">下一页</a>
+                                {% endif %}
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+
+                {#                {% for msg in user_msg %}#}
+                {#                    <div class='col-sm-12 col-xs-12 message'>#}
+                {#                        <img src='{{ user_profile.icon.url }}' class='col-sm-2 col-xs-2' style='border-radius: 50%'>#}
+                {#                        <div class='col-sm-10 col-xs-10'><span style='font-weight: bold;'>{{ msg.user }}</span> <br>#}
+                {#                            <small class='date' style='color:#999'>{{ msg.time|date:"Y-m-d H:i:s" }}</small>#}
+                {#                            <div class='msg_content'>{{ msg.content|safe }}#}
+                {##}
+                {#                                <ul class='infoOperation'>#}
+                {#                                    <li class="infoHandle line">#}
+                {#                                        <a href="javascript:;" class="icon-share "></a>#}
+                {#                                    </li>#}
+                {#                                    <li class="infoHandle line">#}
+                {##}
+                {#                                        <a href="javascript:;" class="icon-comment">&nbsp;&nbsp;0</a>#}
+                {#                                    </li>#}
+                {#                                    {% if request.user == msg.user  %}#}
+                {#                                    <li class="infoHandle line">#}
+                {#                                        <a href="javascript:;" class="icon-thumbs-up">&nbsp;&nbsp;0</a>#}
+                {#                                    </li>#}
+                {##}
+                {#                                    <li class="infoHandle">#}
+                {#                                        <a href="javascript:;" msg-id="{{ msg.id }}" class="icon-trash delMsg"></a>#}
+                {#                                        <i class="msgid" style="opacity:0">{{ msg.id }}</i>#}
+                {#                                    </li>#}
+                {#                                    {% else %}#}
+                {#                                        <li class="infoHandle">#}
+                {#                                        <a href="javascript:;" class="icon-thumbs-up">&nbsp;&nbsp;0</a>#}
+                {#                                    </li>#}
+                {#                                    {% endif %}#}
+                {#                                </ul>#}
+                {#                            </div>#}
+                {#                        </div>#}
+                {#                    </div>#}
+                {##}
+                {#                {% endfor %}#}
+            </div>
+        </div>
+    </div>
+    </div>
+    <div style="text-align:center;margin:50px 0; font:normal 14px/24px 'MicroSoft YaHei';">
+        <p>适用浏览器：360、FireFox、Chrome、Safari、Opera、傲游、搜狗、世界之窗. 不支持IE8及以下浏览器。</p>
+    </div>
+    </body>
+    <script type="text/javascript">
+        $(function () {
+            //监听点赞按钮点击
+            $(".like").one("click", function () {
+                let msg_id = $(this).parents(".message").children(".msgid").html();
+                $.post('{% url 'like' %}', {msg_id: msg_id});
+                let like_count = $(this).html();
+                let count = like_count.match(/\d+/);
+                c = parseInt(count[0]) + 1;
+                $(this).html(" " + c + "").css("color", "red");
+                c = 0;
+                // console.log(count[0]);
+            });
+
+            //监听转发按钮点击
+            $(".share").click(function () {
+                let share_content = prompt("请输入转发理由：", "太赞同了！");
+                if (share_content) {
+                    let msg_content = $(this).parents(".msg_content").children(".content").html();
+                    let author = $(this).parents(".msg_content").siblings(".author").html();
+                    let $share_msg = share_content + "/转发：" + author + "//" + msg_content;
+                    $.ajax({
+                        url: '{% url 'share' %}',
+                        type: 'POST',
+                        data: {
+                            msg_contents: $share_msg,
+                        }
+                    })
+                }
+            });
+
+            //监听评论点击
+            $("body").delegate(".comment_msg", "click", function () {
+                let comment = $(this).parents().next(".comment");  //获取当前点击的微博内容
+                comment.toggleClass('set_display_none');
+                let msg_id = $(this).parents(".message").children(".msgid").html();    //获取当前点击的微博的id编号
+                if ($(".comment").hasClass("set_display_none")) {
+                    $(".comment").html("<div class=\"comment_input_wrap clearfix\">\n" +
+                        "                            <a href=\"#\"><img class=\"comment_user_icon\" src='{{ request.user.profile.icon.url }}'></a>\n" +
+                        "                            <input type=\"text\" placeholder=\"说点什么吧...\" class=\"comment_input\" id=\"comment_content\">\n" +
+                        "                            <button type=\"button\" id=\"send_comment\" class=\"btn btn-default pull-right\">评论</button>\n" +
+                        "                        </div>\n" +
+                        "                        <div class=\"comment_list_wrap clearfix\"></div>");
+                }
+
+                $("#send_comment").click(function () {
+                    console.log('评论：');
+                    let content = $(this).siblings("#comment_content").val();
+                    console.log(content);
+                    $.post('{% url 'post_comment' %}', {content: content, msg_id: msg_id});
+                    $(".comment_list_wrap").prepend("<div class=\"comment_list\">\n" +
+                        "                                <span class=\"comment_list_username\">{{ request.user }}</span>:\n" +
+                        "                                <p class=\"comment_content\">" + content + "</p>\n" +
+                        "                            </div>");
+                });
+
+                $.post('{% url 'comment' %}', {msg_id: msg_id},
+                    function (data) {
+                        if (data.status == 'None') {
+                            $(".comment_list_wrap").html("<div class=\"comment_list\">\n" +
+                                "                                <span class=\"comment_list_username\">暂无评论</span>:\n" +
+                                "                          </div>")
+                        } else {
+                            let comment_list = eval(data);
+                            $.each(comment_list, function (key, value) {
+                                for (let i = 0; i < value.length; i++) {
+                                    let $comment = create_comment(value[i]);
+                                    comment.append($comment);
+                                }
+                            })
+                        }
+                    }
+                );
+            });
+
+
+            //监听删除点击
+            $("body").delegate(".delMsg", "click", function () {
+                let r = confirm("是否删除当前微博？")
+                if (r == true) {
+                    let msg_id = $(this).parents(".message").children(".msgid").html();
+                    $(this).parents(".message").remove();
+                    console.log(msg_id);
+                    $.post('{% url 'del_msg' %}', {msg_id: msg_id});
+                }
+            })
+
+            //关注功能实现
+            $('a.follow').click(function (e) {
+                e.preventDefault();
+                $.post('{% url 'user_follow' %}', {
+                        id: $(this).data('id'),
+                        action: $(this).data('action')
+                    },
+                    function (data) {
+                        if (data['status'] === 'ok') {
+                            let previous_action = $('a.follow').data('action');
+                            // 切换 data-action 属性
+                            $('a.follow').data('action', previous_action === 'follow' ? 'unfollow' : 'follow');
+                            // 切换按钮文字
+                            $('a.follow').text(previous_action === 'follow' ? 'unfollow' : 'follow');
+                            // 更新关注人数
+                            $('')
+                        }
+                    }
+                );
+            });
+        })
+    </script>
+{% endblock %}
+
